@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model shows {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  venue       String
+  address     String?
+  date        DateTime
+  time        String?
+  ticketUrl   String?  @map("ticketurl")
+  imageUrl    String?  @map("imageurl")
+  isPublished Boolean  @default(false) @map("isactive")
+  createdAt   DateTime @default(now()) @map("createdat")
+  updatedAt   DateTime @default(now()) @map("updatedat")
+
+  @@map("shows")
+}
+
+model media {
+  id        String   @id @default(uuid())
+  type      String   @default("image")
+  url       String
+  caption   String?
+  showId    String?  @map("showid")
+  createdAt DateTime @default(now()) @map("createdat")
+
+  @@map("media")
+}
+
+model members {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  bio       String?
+  bioHistory String?  @map("biohistory")
+  imageUrl  String?  @map("imageurl")
+  order     Int      @default(0) @map("order")
+  isActive  Boolean  @default(true) @map("isactive")
+  createdAt DateTime @default(now()) @map("createdat")
+  updatedAt DateTime @updatedAt @map("updatedat")
+
+  @@map("members")
+}
+
+model siteSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now()) @map("createdat")
+  updatedAt DateTime @default(now()) @map("updatedat")
+
+  @@map("site_settings")
+}

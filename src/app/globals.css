@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --gold-aged: #C5A059;
+  --bronze: #8E6D3E;
+  --green-emerald: #2D723B;
+  --green-flag: #009B3A;
+  --green-leaf: #4CAF50;
+  --blue-royal: #002776;
+  --blue-sky: #4A90E2;
+  --violet: #8B5CF6;
+  --yellow-gold: #F9C412;
+  --white: #F5F5F5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-gold-aged: var(--gold-aged);
+  --color-bronze: var(--bronze);
+  --color-green-emerald: var(--green-emerald);
+  --color-green-flag: var(--green-flag);
+  --color-green-leaf: var(--green-leaf);
+  --color-blue-royal: var(--blue-royal);
+  --color-blue-sky: var(--blue-sky);
+  --color-violet: var(--violet);
+  --color-yellow-gold: var(--yellow-gold);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(2deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.4),
+                0 0 40px rgba(197, 160, 89, 0.2),
+                inset 0 0 20px rgba(197, 160, 89, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(197, 160, 89, 0.6),
+                0 0 80px rgba(197, 160, 89, 0.3),
+                inset 0 0 30px rgba(197, 160, 89, 0.2);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(60px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(197, 160, 89, 0.3); }
+  50% { border-color: rgba(197, 160, 89, 0.8); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(197, 160, 89, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease infinite;
+}
+
+.animate-border-glow {
+  animation: borderGlow 2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.glass {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(197, 160, 89, 0.1);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, #C5A059, #F9C412, #009B3A, #C5A059);
+  background-size: 300% 300%;
+  animation: gradientShift 4s ease infinite;
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #C5A059, #F9C412);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.neon-gold {
+  text-shadow: 
+    0 0 10px rgba(197, 160, 89, 0.5),
+    0 0 20px rgba(197, 160, 89, 0.3),
+    0 0 30px rgba(197, 160, 89, 0.2);
+}
+
+.neon-green {
+  text-shadow: 
+    0 0 10px rgba(0, 155, 58, 0.5),
+    0 0 20px rgba(0, 155, 58, 0.3);
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.5), transparent);
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
