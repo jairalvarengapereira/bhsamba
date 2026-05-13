@@ -16,7 +16,7 @@ model shows {
   time        String?
   ticketUrl   String?  @map("ticketurl")
   imageUrl    String?  @map("imageurl")
-  isPublished Boolean  @default(false) @map("isactive")
+  isPublished Boolean  @default(false) @map("ispublished")
   createdAt   DateTime @default(now()) @map("createdat")
   updatedAt   DateTime @default(now()) @map("updatedat")
 
