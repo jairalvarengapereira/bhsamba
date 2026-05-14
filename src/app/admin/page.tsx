@@ -206,13 +206,8 @@ export default function AdminDashboard() {
             onAdd={() => { setEditingItem(null); setShowModal(true); }}
             fields={[
               { name: 'title', label: 'Título', type: 'text' },
-              { name: 'venue', label: 'Local', type: 'text' },
               { name: 'date', label: 'Data', type: 'date' },
-              { name: 'time', label: 'Horário', type: 'text' },
               { name: 'imageUrl', label: 'Imagem', type: 'image' },
-              { name: 'ticketUrl', label: 'URL Ingresso', type: 'text' },
-              { name: 'description', label: 'Descrição', type: 'textarea' },
-              { name: 'isPublished', label: 'Publicar', type: 'checkbox' },
             ]}
           />
         )}
