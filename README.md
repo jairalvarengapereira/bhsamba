@@ -267,4 +267,4 @@ Para mais informações sobre o projeto, entre em contato com a equipe de desenv
 
 ## Licença
 
-Este projeto é propriedade da banda BHSamba.
+Este projeto é propriedade de **Jair Alvarenga Pereira**.
