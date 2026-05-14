@@ -95,29 +95,28 @@ export default function Menu() {
 
       {isOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-[#C5A059]/20 animate-slide-up">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="space-y-2">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="space-y-1">
               {menuItems.map((item, index) => (
                 <a
                   key={item.href}
                   href={item.href}
-                  className="flex items-center gap-4 py-4 px-4 text-[#F5F5F5] hover:text-[#C5A059] rounded-xl hover:bg-[#C5A059]/10 font-medium transition-all duration-300"
+                  className="flex items-center gap-3 py-3 px-4 text-[#F5F5F5] hover:text-[#C5A059] rounded-lg hover:bg-[#C5A059]/10 font-medium transition-all duration-300"
                   onClick={() => setIsOpen(false)}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span>{item.label}</span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100">→</span>
+                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-base">{item.label}</span>
                 </a>
               ))}
             </div>
-            <div className="mt-6 pt-6 border-t border-[#C5A059]/20">
+            <div className="mt-4 pt-4 border-t border-[#C5A059]/20">
               <a 
                 href="#contato" 
-                className="block w-full py-4 px-6 bg-gradient-to-r from-[#C5A059] to-[#F9C412] text-black font-bold text-center rounded-full hover:shadow-lg hover:shadow-[#C5A059]/30 transition-all"
+                className="block w-full py-3 px-4 bg-gradient-to-r from-[#C5A059] to-[#F9C412] text-black font-bold text-center rounded-lg hover:shadow-lg hover:shadow-[#C5A059]/30 transition-all"
                 onClick={() => setIsOpen(false)}
               >
-                🎵 Contratar Show
+                Contratar Show
               </a>
             </div>
           </div>
