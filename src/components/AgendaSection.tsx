@@ -127,15 +127,18 @@ export default function AgendaSection({ shows, id }: AgendaSectionProps) {
                         )}
                       </div>
                       
-                      <div className="flex-1 flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
-                        <div className="flex-1">
-                          <h3 className="text-2xl lg:text-3xl font-bold text-white group-hover:text-[#C5A059] transition-colors">
+                      <div className="flex-1 flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-4 text-center md:text-left">
+                          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white group-hover:text-[#C5A059] transition-colors">
                             {show.title}
                           </h3>
-                          <p className="text-[#F5F5F5]/70 mt-2 text-lg flex items-center gap-2 justify-center md:justify-start">
+                          <p className="text-sm md:text-base text-[#F5F5F5]/70 flex flex-col md:flex-row items-center md:items-start gap-1 md:gap-2 justify-center md:justify-start">
                             <span className="text-[#C5A059]">📍</span> {show.venue}
-                            {show.address && <span className="text-[#F5F5F5]/50 text-sm">- {show.address}</span>}
                           </p>
+                          {show.address && (
+                            <p className="text-xs md:text-sm text-[#F5F5F5]/50 flex items-center gap-1 justify-center md:justify-start">
+                              {show.address}
+                            </p>
+                          )}
                         </div>
                         
                         <div className="flex gap-3 shrink-0">
