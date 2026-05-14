@@ -199,7 +199,7 @@ export default function AdminDashboard() {
             fields={[
               { name: 'title', label: 'Título', type: 'text' },
               { name: 'venue', label: 'Local', type: 'text' },
-              { name: 'date', label: 'Data', type: 'datetime-local' },
+              { name: 'date', label: 'Data', type: 'date' },
               { name: 'time', label: 'Horário', type: 'text' },
               { name: 'imageUrl', label: 'Imagem', type: 'image' },
               { name: 'ticketUrl', label: 'URL Ingresso', type: 'text' },
@@ -477,6 +477,13 @@ const fields = type === 'members' ? [
               <input
                 type="datetime-local"
                 value={formData[field.name] ? new Date(formData[field.name]).toISOString().slice(0, 16) : ''}
+                onChange={e => setFormData({ ...formData, [field.name]: e.target.value })}
+                className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+              />
+            ) : field.type === 'date' ? (
+              <input
+                type="date"
+                value={formData[field.name] ? new Date(formData[field.name]).toISOString().slice(0, 10) : ''}
                 onChange={e => setFormData({ ...formData, [field.name]: e.target.value })}
                 className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
               />
