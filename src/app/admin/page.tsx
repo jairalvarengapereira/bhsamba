@@ -375,7 +375,7 @@ const fields = type === 'members' ? [
     { name: 'title', label: 'Título *', type: 'text', placeholder: 'Ex: Samba no Parque', required: true },
     { name: 'venue', label: 'Local *', type: 'text', placeholder: 'Ex: Centro Cultural', required: true },
     { name: 'address', label: 'Endereço', type: 'text', placeholder: 'Ex: Rua das Flores, 123' },
-    { name: 'date', label: 'Data *', type: 'datetime-local', required: true },
+    { name: 'date', label: 'Data *', type: 'date', required: true },
     { name: 'time', label: 'Horário', type: 'text', placeholder: 'Ex: 21:00' },
     { name: 'imageUrl', label: 'URL da Imagem', type: 'text', placeholder: 'Cole a URL da imagem', isImage: true },
     { name: 'ticketUrl', label: 'URL Ingresso', type: 'text', placeholder: 'Ex: https://ingressos.com/show123' },
