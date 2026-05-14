@@ -144,9 +144,9 @@ export default function AdminDashboard() {
       <header className="bg-zinc-900 border-b border-zinc-800 p-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold text-[#C5A059]">Painel Admin - BHSamba</h1>
-          <button onClick={() => window.history.back()} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-white hover:bg-zinc-700 rounded-lg transition-all">
+          <button onClick={() => window.location.href = '/'} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-white hover:bg-zinc-700 rounded-lg transition-all">
             <span>←</span>
-            <span>Voltar</span>
+            <span>Voltar ao Site</span>
           </button>
         </div>
       </header>
