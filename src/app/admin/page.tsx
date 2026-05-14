@@ -156,9 +156,9 @@ export default function AdminDashboard() {
       </header>
 
       <div className="max-w-6xl mx-auto p-4">
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="grid grid-cols-4 gap-2 mb-6">
           {([
-            { key: 'settings', label: 'Configurações', icon: Settings },
+            { key: 'settings', label: 'Config', icon: Settings },
             { key: 'members', label: 'Músicos', icon: Users },
             { key: 'shows', label: 'Shows', icon: Calendar },
             { key: 'media', label: 'Galeria', icon: Image },
@@ -166,14 +166,14 @@ export default function AdminDashboard() {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded ${
+              className={`flex flex-col items-center gap-1 py-3 px-2 rounded-lg transition-all ${
                 activeTab === key
                   ? 'bg-[#C5A059] text-black'
                   : 'bg-zinc-800 text-white hover:bg-zinc-700'
               }`}
             >
-              <Icon size={18} />
-              <span>{label}</span>
+              <Icon size={20} />
+              <span className="text-xs font-medium">{label}</span>
             </button>
           ))}
         </div>
