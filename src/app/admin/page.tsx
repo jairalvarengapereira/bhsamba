@@ -182,7 +182,6 @@ export default function AdminDashboard() {
               { name: 'name', label: 'Nome', type: 'text' },
               { name: 'role', label: 'Função', type: 'text' },
               { name: 'imageUrl', label: 'Foto', type: 'image' },
-              { name: 'bio', label: 'Biografia Curta', type: 'textarea' },
               { name: 'order', label: 'Ordem', type: 'number' },
               { name: 'isActive', label: 'Ativo', type: 'checkbox' },
             ]}
