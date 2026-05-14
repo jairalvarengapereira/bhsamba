@@ -433,14 +433,12 @@ const fields = type === 'members' ? [
         </h2>
 
         {fields.map((field, index) => {
-            const isDateAndTime = field.name === 'date' && index + 1 < fields.length && fields[index + 1].name === 'time';
-            const isTime = field.name === 'time' && index > 0 && fields[index - 1].name === 'date';
+            const nextField = fields[index + 1];
+            const isDateAndTime = field.name === 'date' && nextField?.name === 'time';
             
-            if (isTime) return null;
-            
-            return (
-              <div key={field.name} className={`mb-3 ${isDateAndTime ? 'flex gap-3' : ''}`}>
-                {isDateAndTime && (
+            if (isDateAndTime) {
+              return (
+                <div key={field.name} className="flex gap-3 mb-3">
                   <div className="flex-1">
                     <label className="block text-gray-400 text-sm mb-1">{field.label}</label>
                     <input
@@ -450,10 +448,8 @@ const fields = type === 'members' ? [
                       className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
                     />
                   </div>
-                )}
-                {isDateAndTime && (
                   <div className="flex-1">
-                    <label className="block text-gray-400 text-sm mb-1">{fields[index + 1].label}</label>
+                    <label className="block text-gray-400 text-sm mb-1">{nextField.label}</label>
                     <input
                       type="text"
                       value={formData['time'] || ''}
@@ -462,8 +458,17 @@ const fields = type === 'members' ? [
                       className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
                     />
                   </div>
-                )}
-            {field.type === 'checkbox' ? (
+                </div>
+              );
+            }
+            
+            if (field.name === 'time' && index > 0 && fields[index - 1].name === 'date') {
+              return null;
+            }
+            
+            return (
+              <div key={field.name} className="mb-3">
+                {field.type === 'checkbox' ? (
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -516,7 +521,7 @@ const fields = type === 'members' ? [
                 onChange={e => setFormData({ ...formData, [field.name]: e.target.value })}
                 className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
               />
-            ) : (
+            ) : field.name === 'date' && fields[index + 1]?.name === 'time' ? null : (
               <input
                 type={field.type}
                 value={formData[field.name] || ''}
