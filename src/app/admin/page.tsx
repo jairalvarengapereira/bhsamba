@@ -432,8 +432,37 @@ const fields = type === 'members' ? [
           {item ? 'Editar' : 'Adicionar'} {type === 'members' ? 'Músico' : type === 'shows' ? 'Show' : 'Mídia'}
         </h2>
 
-        {fields.map(field => (
-          <div key={field.name} className="mb-3">
+        {fields.map((field, index) => {
+            const isDateAndTime = field.name === 'date' && index + 1 < fields.length && fields[index + 1].name === 'time';
+            const isTime = field.name === 'time' && index > 0 && fields[index - 1].name === 'date';
+            
+            if (isTime) return null;
+            
+            return (
+              <div key={field.name} className={`mb-3 ${isDateAndTime ? 'flex gap-3' : ''}`}>
+                {isDateAndTime && (
+                  <div className="flex-1">
+                    <label className="block text-gray-400 text-sm mb-1">{field.label}</label>
+                    <input
+                      type="date"
+                      value={formData[field.name] ? new Date(formData[field.name]).toISOString().slice(0, 10) : ''}
+                      onChange={e => setFormData({ ...formData, [field.name]: e.target.value })}
+                      className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+                    />
+                  </div>
+                )}
+                {isDateAndTime && (
+                  <div className="flex-1">
+                    <label className="block text-gray-400 text-sm mb-1">{fields[index + 1].label}</label>
+                    <input
+                      type="text"
+                      value={formData['time'] || ''}
+                      onChange={e => setFormData({ ...formData, ['time']: e.target.value })}
+                      placeholder="Ex: 21:00"
+                      className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+                    />
+                  </div>
+                )}
             {field.type === 'checkbox' ? (
               <label className="flex items-center gap-2">
                 <input
@@ -497,7 +526,8 @@ const fields = type === 'members' ? [
               />
             )}
           </div>
-        ))}
+            );
+          })}
 
         <div className="flex gap-2 mt-4">
           <button type="submit" className="flex-1 py-2 bg-[#C5A059] hover:bg-[#F9C412] text-black font-medium rounded">
