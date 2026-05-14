@@ -191,10 +191,8 @@ export default function AdminDashboard() {
             onAdd={() => { setEditingItem(null); setShowModal(true); }}
             fields={[
               { name: 'name', label: 'Nome', type: 'text' },
-              { name: 'role', label: 'Função', type: 'text' },
               { name: 'imageUrl', label: 'Foto', type: 'image' },
               { name: 'order', label: 'Ordem', type: 'number' },
-              { name: 'isActive', label: 'Ativo', type: 'checkbox' },
             ]}
           />
         )}
