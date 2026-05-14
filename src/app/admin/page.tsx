@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { Pencil, Trash2, Plus, Image, X, Check, Video, Settings, Users, Calendar, CheckSquare } from 'lucide-react';
 
 interface Member {
   id: string;
@@ -144,25 +145,35 @@ export default function AdminDashboard() {
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold text-[#C5A059]">Painel Admin - BHSamba</h1>
           <div className="flex gap-4">
-            <a href="/" className="text-amber-400 hover:text-amber-300">Ver Site</a>
-            <button onClick={() => { document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'; router.push('/admin/login'); }} className="text-gray-400 hover:text-white">Sair</button>
+            <a href="/" className="flex items-center gap-1 text-amber-400 hover:text-amber-300">
+              <span>Ver Site</span>
+            </a>
+            <button onClick={() => { document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'; router.push('/admin/login'); }} className="flex items-center gap-1 text-gray-400 hover:text-white">
+              <span>Sair</span>
+            </button>
           </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto p-4">
         <div className="flex gap-2 mb-6 flex-wrap">
-          {(['settings', 'members', 'shows', 'media'] as const).map(tab => (
+          {([
+            { key: 'settings', label: 'Configurações', icon: Settings },
+            { key: 'members', label: 'Músicos', icon: Users },
+            { key: 'shows', label: 'Shows', icon: Calendar },
+            { key: 'media', label: 'Galeria', icon: Image },
+          ] as const).map(({ key, label, icon: Icon }) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded ${
-                activeTab === tab
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`flex items-center gap-2 px-4 py-2 rounded ${
+                activeTab === key
                   ? 'bg-[#C5A059] text-black'
                   : 'bg-zinc-800 text-white hover:bg-zinc-700'
               }`}
             >
-              {tab === 'settings' ? 'Configurações' : tab === 'members' ? 'Músicos' : tab === 'shows' ? 'Shows' : 'Galeria'}
+              <Icon size={18} />
+              <span>{label}</span>
             </button>
           ))}
         </div>
@@ -310,8 +321,9 @@ function CrudTab({ title, items, onEdit, onDelete, onAdd, fields }: {
     <div className="bg-zinc-900 rounded-lg overflow-hidden">
       <div className="p-4 border-b border-zinc-800 flex justify-between items-center">
         <h3 className="font-bold text-[#C5A059]">Gerenciar {title}s</h3>
-        <button onClick={onAdd} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded">
-          + Adicionar
+        <button onClick={onAdd} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded">
+          <Plus size={18} />
+          <span>Adicionar</span>
         </button>
       </div>
       
@@ -339,8 +351,14 @@ function CrudTab({ title, items, onEdit, onDelete, onAdd, fields }: {
                   </td>
                 ))}
                 <td className="p-3">
-                  <button onClick={() => onEdit(item)} className="text-blue-400 hover:text-blue-300 mr-3">Editar</button>
-                  <button onClick={() => onDelete(item.id)} className="text-red-400 hover:text-red-300">Excluir</button>
+                  <div className="flex gap-2">
+                    <button onClick={() => onEdit(item)} className="p-2 text-blue-400 hover:bg-blue-400/20 rounded" title="Editar">
+                      <Pencil size={18} />
+                    </button>
+                    <button onClick={() => onDelete(item.id)} className="p-2 text-red-400 hover:bg-red-400/20 rounded" title="Excluir">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -492,9 +510,9 @@ const fields = type === 'members' ? [
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, [field.name]: '' })}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
                     >
-                      ×
+                      <X size={14} />
                     </button>
                   </div>
                 )}
@@ -534,11 +552,13 @@ const fields = type === 'members' ? [
           })}
 
         <div className="flex gap-2 mt-4">
-          <button type="submit" className="flex-1 py-2 bg-[#C5A059] hover:bg-[#F9C412] text-black font-medium rounded">
-            Salvar
+          <button type="submit" className="flex items-center justify-center gap-2 flex-1 py-2 bg-[#C5A059] hover:bg-[#F9C412] text-black font-medium rounded">
+            <Check size={18} />
+            <span>Salvar</span>
           </button>
-          <button type="button" onClick={onClose} className="flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded">
-            Cancelar
+          <button type="button" onClick={onClose} className="flex items-center justify-center gap-2 flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded">
+            <X size={18} />
+            <span>Cancelar</span>
           </button>
         </div>
       </form>
