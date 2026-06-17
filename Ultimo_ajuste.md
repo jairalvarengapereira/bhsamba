@@ -25,6 +25,23 @@
 
 ## Último Fix Aplicado (17/06/2026)
 
+**Commit:** `fa6c83c` — `fix: corrigir problema de timezone na data dos shows`
+
+**Problema:** Ao cadastrar um show, a data era salva com um dia de antecedência. O JavaScript `new Date("2026-06-20")` interpreta como UTC midnight, que no horário de Brasília (UTC-3) é 19/06 às 21:00. O PostgreSQL `@db.Date` truncava para 19/06.
+
+**Solução:**
+1. Função `parseDate()` criada em `admin.ts` — faz parse manual de "YYYY-MM-DD" e cria Date em UTC noon, evitando o shift de timezone.
+2. Form submission em `page.tsx` — conversão manual sem `new Date()`.
+3. `formatDate()` em `AgendaSection.tsx` — usa métodos UTC (`getUTCDate`, `getUTCMonth`, etc.) para exibir a data correta.
+4. Admin page — display de data com `timeZone: 'UTC'`.
+
+**Arquivos alterados:**
+- `src/lib/admin.ts` — função `parseDate()` + uso em create/update
+- `src/app/admin/page.tsx` — conversão de data no form + display com UTC
+- `src/components/AgendaSection.tsx` — `formatDate()` com métodos UTC
+
+## Fix Anterior (17/06/2026)
+
 **Commit:** `1a10d0a` — `fix: ordenar shows por data e horário crescente`
 
 **Problema:** Shows no mesmo dia não eram exibidos em ordem cronológica. O campo `date` no schema Prisma era `DateTime`, e o `orderBy` só considerava `date: 'asc'`, causando ordenação por ordem de inserção quando dois shows compartilhavam a mesma data.
