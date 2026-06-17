@@ -26,10 +26,10 @@ function formatDate(date: Date) {
   const days = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
   const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
   return {
-    day: d.getDate().toString().padStart(2, '0'),
-    month: months[d.getMonth()],
-    weekday: days[d.getDay()],
-    full: d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }),
+    day: d.getUTCDate().toString().padStart(2, '0'),
+    month: months[d.getUTCMonth()],
+    weekday: days[d.getUTCDay()],
+    full: d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }),
   };
 }
 

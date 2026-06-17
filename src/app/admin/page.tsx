@@ -332,7 +332,7 @@ function CrudTab({ title, items, onEdit, onDelete, onAdd, fields }: {
                 {fields.map(f => (
                   <td key={f.name} className="p-3">
                     {f.type === 'checkbox' ? (item[f.name] ? 'Sim' : 'Não') : 
-                     f.name === 'date' ? new Date(item[f.name]).toLocaleDateString('pt-BR') :
+                     f.name === 'date' ? new Date(item[f.name]).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) :
                      f.name.includes('Url') || f.type === 'image' ? (
                        item[f.name] ? <img src={item[f.name]} alt="" className="w-12 h-12 object-cover rounded" /> : '-'
                      ) :
@@ -426,7 +426,7 @@ const fields = type === 'members' ? [
       return;
     }
     const data = { ...formData, id: item?.id };
-    if (data.date) data.date = new Date(data.date).toISOString();
+    if (data.date) { const [y, m, d] = data.date.split('-').map(Number); data.date = new Date(Date.UTC(y, m - 1, d, 12, 0, 0)).toISOString(); }
     if (data.order) data.order = parseInt(data.order);
     onSave(type, data);
   };

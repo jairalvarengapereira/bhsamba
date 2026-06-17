@@ -1,5 +1,10 @@
 import { prisma } from './db';
 
+function parseDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+}
+
 export async function getMembers() {
   return await prisma.members.findMany({
     orderBy: { order: 'asc' },
@@ -78,7 +83,7 @@ export async function createShow(data: {
       description: data.description || null,
       venue: data.venue,
       address: data.address || null,
-      date: new Date(data.date),
+      date: parseDate(data.date),
       time: data.time || null,
       ticketUrl: data.ticketUrl || null,
       imageUrl: data.imageUrl || null,
@@ -105,7 +110,7 @@ export async function updateShow(id: string, data: {
       ...(data.description !== undefined && { description: data.description }),
       ...(data.venue && { venue: data.venue }),
       ...(data.address !== undefined && { address: data.address }),
-      ...(data.date && { date: new Date(data.date) }),
+      ...(data.date && { date: parseDate(data.date) }),
       ...(data.time !== undefined && { time: data.time }),
       ...(data.ticketUrl !== undefined && { ticketUrl: data.ticketUrl }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
