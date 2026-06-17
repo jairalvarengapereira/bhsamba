@@ -58,7 +58,7 @@ export async function deleteMember(id: string) {
 
 export async function getShows() {
   return await prisma.shows.findMany({
-    orderBy: { date: 'asc' },
+    orderBy: [{ date: 'asc' }, { time: 'asc' }],
   });
 }
 

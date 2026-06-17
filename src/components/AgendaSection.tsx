@@ -36,6 +36,13 @@ function formatDate(date: Date) {
 export default function AgendaSection({ shows, id }: AgendaSectionProps) {
   const [lightboxImage, setLightboxImage] = useState<{ src: string; alt: string } | null>(null);
 
+  const sortedShows = [...shows].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    if (dateA !== dateB) return dateA - dateB;
+    return (a.time || '').localeCompare(b.time || '');
+  });
+
   return (
     <>
       {lightboxImage && (
@@ -83,7 +90,7 @@ export default function AgendaSection({ shows, id }: AgendaSectionProps) {
             </div>
           ) : (
             <div className="space-y-6">
-              {shows.map((show, index) => {
+              {sortedShows.map((show, index) => {
                 const dateInfo = formatDate(show.date);
                 
                 return (

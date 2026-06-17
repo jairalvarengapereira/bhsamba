@@ -31,7 +31,7 @@ export async function getUpcomingShows() {
       date: { gte: new Date() },
       isPublished: true,
     },
-    orderBy: { date: 'asc' },
+    orderBy: [{ date: 'asc' }, { time: 'asc' }],
   });
 }
 

@@ -12,7 +12,7 @@ model shows {
   description String?
   venue       String
   address     String?
-  date        DateTime
+  date        DateTime @db.Date
   time        String?
   ticketUrl   String?  @map("ticketurl")
   imageUrl    String?  @map("imageurl")
