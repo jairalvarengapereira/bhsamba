@@ -1,6 +1,6 @@
 # BHSamba — Último Ajuste e Ponto de Partida
 
-## Data: 08/06/2026
+## Data: 17/06/2026
 
 ## Projeto
 
@@ -23,7 +23,24 @@
 | Deploy | Vercel |
 | Ícones | Lucide React |
 
-## Último Fix Aplicado (08/06/2026)
+## Último Fix Aplicado (17/06/2026)
+
+**Commit:** `1a10d0a` — `fix: ordenar shows por data e horário crescente`
+
+**Problema:** Shows no mesmo dia não eram exibidos em ordem cronológica. O campo `date` no schema Prisma era `DateTime`, e o `orderBy` só considerava `date: 'asc'`, causando ordenação por ordem de inserção quando dois shows compartilhavam a mesma data.
+
+**Solução:**
+1. Schema Prisma alterado: `date DateTime` → `date DateTime @db.Date` — agora o PostgreSQL armazena apenas a data (sem hora), garantindo valores idênticos para shows no mesmo dia.
+2. Queries Prisma atualizadas em `db.ts` e `admin.ts`: `orderBy: [{ date: 'asc' }, { time: 'asc' }]` — ordenação secundária por horário.
+3. Ordenação client-side adicionada em `AgendaSection.tsx` como garantia extra.
+
+**Arquivos alterados:**
+- `prisma/schema.prisma` — campo `date` alterado para `@db.Date`
+- `src/lib/db.ts` — `getUpcomingShows()` com orderBy composto
+- `src/lib/admin.ts` — `getShows()` com orderBy composto
+- `src/components/AgendaSection.tsx` — sort client-side
+
+## Fix Anterior (08/06/2026)
 
 **Commit:** `4b1ca0b` — `fix: lazy init Supabase client to prevent build crash when env vars are missing`
 
@@ -157,4 +174,4 @@ Ou especifique a tarefa:
 ---
 
 **Criado em:** 14/05/2026
-**Última atualização:** 08/06/2026
+**Última atualização:** 17/06/2026
