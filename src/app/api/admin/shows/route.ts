@@ -13,20 +13,24 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('POST /api/admin/shows body:', JSON.stringify(body, null, 2));
     const show = await createShow(body);
     return NextResponse.json(show);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create show' }, { status: 500 });
+    console.error('POST /api/admin/shows error:', error);
+    return NextResponse.json({ error: 'Failed to create show', details: String(error) }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('PUT /api/admin/shows body:', JSON.stringify(body, null, 2));
     const show = await updateShow(body.id, body);
     return NextResponse.json(show);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update show' }, { status: 500 });
+    console.error('PUT /api/admin/shows error:', error);
+    return NextResponse.json({ error: 'Failed to update show', details: String(error) }, { status: 500 });
   }
 }
 
