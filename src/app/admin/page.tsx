@@ -426,7 +426,6 @@ const fields = type === 'members' ? [
       return;
     }
     const data = { ...formData, id: item?.id };
-    if (data.date) { const [y, m, d] = data.date.split('-').map(Number); data.date = new Date(Date.UTC(y, m - 1, d, 12, 0, 0)).toISOString(); }
     if (data.order) data.order = parseInt(data.order);
     onSave(type, data);
   };

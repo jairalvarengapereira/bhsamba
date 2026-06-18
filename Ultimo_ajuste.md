@@ -23,7 +23,18 @@
 | Deploy | Vercel |
 | Ícones | Lucide React |
 
-## Último Fix Aplicado (17/06/2026)
+## Último Fix Aplicado (18/06/2026)
+
+**Commit:** `xxxxxxx` — `fix: corrigir erro 500 ao cadastrar/editar show (data NaN)`
+
+**Problema:** Ao cadastrar ou editar um show pelo painel admin, a requisição PUT/POST retornava erro 500. O `handleSubmit` em `page.tsx` convertia a data para ISO string (`"2026-06-20T12:00:00.000Z"`). Depois, `parseDate()` em `admin.ts` fazia `split('-')` nessa string ISO, gerando `["2026", "06", "20T12", ...]` — o `d` resultava em `NaN`, criando data inválida que o Prisma rejeitava.
+
+**Solução:** Removida a conversão de data no `handleSubmit`. O input HTML `type="date"` já envia `"YYYY-MM-DD"`, que é exatamente o formato que `parseDate()` espera e manipula corretamente.
+
+**Arquivo alterado:**
+- `src/app/admin/page.tsx` — removida linha de conversão de data no `handleSubmit`
+
+## Fix Anterior (17/06/2026)
 
 **Commit:** `fa6c83c` — `fix: corrigir problema de timezone na data dos shows`
 
@@ -191,4 +202,4 @@ Ou especifique a tarefa:
 ---
 
 **Criado em:** 14/05/2026
-**Última atualização:** 17/06/2026
+**Última atualização:** 18/06/2026
