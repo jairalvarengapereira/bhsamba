@@ -426,6 +426,10 @@ const fields = type === 'members' ? [
       return;
     }
     const data = { ...formData, id: item?.id };
+    if (data.date) {
+      const d = new Date(data.date);
+      data.date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+    }
     if (data.order) data.order = parseInt(data.order);
     onSave(type, data);
   };

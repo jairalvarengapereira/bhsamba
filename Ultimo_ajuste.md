@@ -25,14 +25,14 @@
 
 ## Último Fix Aplicado (18/06/2026)
 
-**Commit:** `c18abfa` — `fix: corrigir erro 500 ao cadastrar/editar show (data NaN)`
+**Commit:** `xxxxxxx` — `fix: normalizar data no form para evitar NaN no update de show`
 
-**Problema:** Ao cadastrar ou editar um show pelo painel admin, a requisição PUT/POST retornava erro 500. O `handleSubmit` em `page.tsx` convertia a data para ISO string (`"2026-06-20T12:00:00.000Z"`). Depois, `parseDate()` em `admin.ts` fazia `split('-')` nessa string ISO, gerando `["2026", "06", "20T12", ...]` — o `d` resultava em `NaN`, criando data inválida que o Prisma rejeitava.
+**Problema:** Ao editar um show existente e fazer upload de imagem, o `formData.date` mantinha o valor original do banco (string ISO como `"2026-06-20T00:00:00.000Z"`). Quando o usuário clicava "Salvar" sem alterar a data, essa string ISO era enviada para `parseDate()` que fazia `split('-')` e gerava `d = NaN` (por causa de `"20T00"`), resultando em data inválida.
 
-**Solução:** Removida a conversão de data no `handleSubmit`. O input HTML `type="date"` já envia `"YYYY-MM-DD"`, que é exatamente o formato que `parseDate()` espera e manipula corretamente.
+**Solução:** Adicionada normalização no `handleSubmit` que converte qualquer formato de data para `"YYYY-MM-DD"` usando métodos UTC, garantindo compatibilidade com `parseDate()`.
 
 **Arquivo alterado:**
-- `src/app/admin/page.tsx` — removida linha de conversão de data no `handleSubmit`
+- `src/app/admin/page.tsx` — normalização de data no `handleSubmit` com `getUTCFullYear()`, `getUTCMonth()`, `getUTCDate()`
 
 ## Fix Anterior (17/06/2026)
 
