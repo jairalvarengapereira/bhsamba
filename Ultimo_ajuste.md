@@ -25,7 +25,7 @@
 
 ## Último Fix Aplicado (18/06/2026)
 
-**Commit:** `xxxxxxx` — `fix: corrigir erro 500 ao cadastrar/editar show (data NaN)`
+**Commit:** `c18abfa` — `fix: corrigir erro 500 ao cadastrar/editar show (data NaN)`
 
 **Problema:** Ao cadastrar ou editar um show pelo painel admin, a requisição PUT/POST retornava erro 500. O `handleSubmit` em `page.tsx` convertia a data para ISO string (`"2026-06-20T12:00:00.000Z"`). Depois, `parseDate()` em `admin.ts` fazia `split('-')` nessa string ISO, gerando `["2026", "06", "20T12", ...]` — o `d` resultava em `NaN`, criando data inválida que o Prisma rejeitava.
 
