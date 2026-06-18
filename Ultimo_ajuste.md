@@ -25,7 +25,7 @@
 
 ## Último Fix Aplicado (18/06/2026)
 
-**Commit:** `xxxxxxx` — `fix: normalizar data no form para evitar NaN no update de show`
+**Commit:** `5d59a39` — `fix: normalizar data no form para evitar NaN no update de show`
 
 **Problema:** Ao editar um show existente e fazer upload de imagem, o `formData.date` mantinha o valor original do banco (string ISO como `"2026-06-20T00:00:00.000Z"`). Quando o usuário clicava "Salvar" sem alterar a data, essa string ISO era enviada para `parseDate()` que fazia `split('-')` e gerava `d = NaN` (por causa de `"20T00"`), resultando em data inválida.
 
