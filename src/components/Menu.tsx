@@ -20,6 +20,7 @@ export default function Menu() {
     { label: 'Componentes', href: '#componentes', icon: '🎵' },
     { label: 'Agenda', href: '#agenda', icon: '🎤' },
     { label: 'Galeria', href: '#galeria', icon: '📸' },
+    { label: 'Recados', href: '/mural', icon: '🎙️' },
     { label: 'Contato', href: '#contato', icon: '💬' },
   ];
 

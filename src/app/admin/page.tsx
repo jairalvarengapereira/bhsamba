@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Pencil, Trash2, Plus, Image, X, Check, Video, Settings, Users, Calendar, CheckSquare } from 'lucide-react';
+import { Pencil, Trash2, Plus, Image, X, Check, Video, Settings, Users, Calendar, CheckSquare, Volume2, Upload } from 'lucide-react';
 
 interface Member {
   id: string;
@@ -44,12 +44,30 @@ interface Settings {
   youtube?: string;
 }
 
+interface VoiceMessage {
+  id: string;
+  senderPhone: string;
+  senderName: string | null;
+  audioUrl: string;
+  duration: number | null;
+  status: string;
+  memberId: string | null;
+  createdAt: string;
+  member: {
+    id: string;
+    name: string;
+    role: string;
+    imageUrl: string | null;
+  } | null;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'settings' | 'members' | 'shows' | 'media'>('settings');
+  const [activeTab, setActiveTab] = useState<'settings' | 'members' | 'shows' | 'media' | 'messages'>('settings');
   const [members, setMembers] = useState<Member[]>([]);
   const [shows, setShows] = useState<Show[]>([]);
   const [media, setMedia] = useState<Media[]>([]);
+  const [messages, setMessages] = useState<VoiceMessage[]>([]);
   const [settings, setSettings] = useState<Settings>({});
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -72,16 +90,18 @@ export default function AdminDashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [settingsRes, membersRes, showsRes, mediaRes] = await Promise.all([
+      const [settingsRes, membersRes, showsRes, mediaRes, messagesRes] = await Promise.all([
         fetch('/api/admin/settings'),
         fetch('/api/admin/members'),
         fetch('/api/admin/shows'),
         fetch('/api/admin/media'),
+        fetch('/api/admin/mural'),
       ]);
       setSettings(await settingsRes.json());
       setMembers(await membersRes.json());
       setShows(await showsRes.json());
       setMedia(await mediaRes.json());
+      setMessages(await messagesRes.json());
     } catch (error) {
       console.error('Failed to load data:', error);
     }
@@ -152,12 +172,13 @@ export default function AdminDashboard() {
       </header>
 
       <div className="max-w-6xl mx-auto p-4">
-        <div className="grid grid-cols-4 gap-2 mb-6">
+        <div className="grid grid-cols-5 gap-2 mb-6">
           {([
             { key: 'settings', label: 'Config', icon: Settings },
             { key: 'members', label: 'Músicos', icon: Users },
             { key: 'shows', label: 'Shows', icon: Calendar },
             { key: 'media', label: 'Galeria', icon: Image },
+            { key: 'messages', label: 'Recados', icon: Volume2 },
           ] as const).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -221,6 +242,25 @@ export default function AdminDashboard() {
             ]}
           />
         )}
+
+        {activeTab === 'messages' && (
+          <MessagesTab
+            messages={members}
+            onStatusChange={async (id, status) => {
+              await fetch('/api/admin/mural', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status }),
+              });
+              loadData();
+            }}
+            onDelete={async (id) => {
+              if (!confirm('Confirmar exclusão?')) return;
+              await fetch(`/api/admin/mural?id=${id}`, { method: 'DELETE' });
+              loadData();
+            }}
+          />
+        )}
       </div>
 
       {showModal && (
@@ -231,6 +271,191 @@ export default function AdminDashboard() {
           onClose={() => { setShowModal(false); setEditingItem(null); }}
         />
       )}
+    </div>
+  );
+}
+
+function MessagesTab({ messages: members, onStatusChange, onDelete }: {
+  messages: Member[];
+  onStatusChange: (id: string, status: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const [audioMessages, setAudioMessages] = useState<VoiceMessage[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<string>('');
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+
+  const loadMessages = async () => {
+    setLoadingMessages(true);
+    try {
+      const res = await fetch('/api/admin/mural');
+      if (res.ok) {
+        const data = await res.json();
+        setAudioMessages(data);
+      }
+    } catch (err) {
+      console.error('Failed to load messages:', err);
+    }
+    setLoadingMessages(false);
+  };
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      await loadMessages();
+    };
+    fetchMessages();
+  }, []);
+
+  const handleUploadAudio = async () => {
+    if (!audioFile) {
+      alert('Selecione um arquivo de áudio');
+      return;
+    }
+
+    setUploadingAudio(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', audioFile);
+      if (selectedMember) {
+        formData.append('memberId', selectedMember);
+      }
+
+      const res = await fetch('/api/admin/mural/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        alert('Áudio enviado com sucesso!');
+        setAudioFile(null);
+        setSelectedMember('');
+        loadMessages();
+      } else {
+        const error = await res.json();
+        alert('Erro ao enviar: ' + error.error);
+      }
+    } catch (error) {
+      alert('Erro ao enviar áudio');
+    }
+    setUploadingAudio(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-zinc-900 rounded-lg p-4">
+        <h3 className="font-bold text-[#C5A059] mb-4">Enviar Áudio Manual</h3>
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-gray-400 text-sm mb-1">Músico (opcional)</label>
+            <select
+              value={selectedMember}
+              onChange={(e) => setSelectedMember(e.target.value)}
+              className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+            >
+              <option value="">Selecionar músico...</option>
+              {members.map((m) => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-gray-400 text-sm mb-1">Arquivo de Áudio</label>
+            <input
+              type="file"
+              accept="audio/*,.ogg,.mp3,.wav"
+              onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
+              className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+            />
+          </div>
+          <button
+            onClick={handleUploadAudio}
+            disabled={uploadingAudio || !audioFile}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50"
+          >
+            <Upload size={18} />
+            <span>{uploadingAudio ? 'Enviando...' : 'Enviar'}</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900 rounded-lg overflow-hidden">
+        <div className="p-4 border-b border-zinc-800">
+          <h3 className="font-bold text-[#C5A059]">Recados Recebidos</h3>
+        </div>
+
+        {loadingMessages ? (
+          <p className="p-4 text-gray-400 text-center">Carregando...</p>
+        ) : audioMessages.length === 0 ? (
+          <p className="p-4 text-gray-400 text-center">Nenhum recado recebido</p>
+        ) : (
+          <div className="divide-y divide-zinc-800">
+            {audioMessages.map((msg) => (
+              <div key={msg.id} className="p-4 hover:bg-zinc-800/50">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    {msg.member?.imageUrl ? (
+                      <img src={msg.member.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center">
+                        <Users size={18} className="text-gray-400" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-white font-medium">{msg.member?.name || msg.senderName || 'Desconhecido'}</p>
+                      <p className="text-gray-400 text-sm">{msg.senderPhone}</p>
+                      <p className="text-gray-500 text-xs">{new Date(msg.createdAt).toLocaleString('pt-BR')}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 text-xs rounded ${
+                      msg.status === 'approved' ? 'bg-green-900/50 text-green-400' :
+                      msg.status === 'rejected' ? 'bg-red-900/50 text-red-400' :
+                      'bg-yellow-900/50 text-yellow-400'
+                    }`}>
+                      {msg.status === 'approved' ? 'Aprovado' :
+                       msg.status === 'rejected' ? 'Rejeitado' : 'Pendente'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-3 ml-13">
+                  <audio controls src={msg.audioUrl} className="h-8 w-full max-w-md" />
+                </div>
+
+                <div className="mt-3 flex gap-2 ml-13">
+                  {msg.status !== 'approved' && (
+                    <button
+                      onClick={() => onStatusChange(msg.id, 'approved')}
+                      className="flex items-center gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded"
+                    >
+                      <Check size={14} />
+                      Aprovar
+                    </button>
+                  )}
+                  {msg.status !== 'rejected' && (
+                    <button
+                      onClick={() => onStatusChange(msg.id, 'rejected')}
+                      className="flex items-center gap-1 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded"
+                    >
+                      <X size={14} />
+                      Rejeitar
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onDelete(msg.id)}
+                    className="flex items-center gap-1 px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+                  >
+                    <Trash2 size={14} />
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -374,6 +599,7 @@ function ModalForm({ type, item, onSave, onClose }: {
 const fields = type === 'members' ? [
     { name: 'name', label: 'Nome *', type: 'text', placeholder: 'Ex: João Silva', required: true },
     { name: 'role', label: 'Função *', type: 'text', placeholder: 'Ex: Percussão', required: true },
+    { name: 'phone', label: 'WhatsApp', type: 'text', placeholder: 'Ex: 5531999998888' },
     { name: 'imageUrl', label: 'URL da Foto', type: 'text', placeholder: 'Cole a URL da imagem', isImage: true },
     { name: 'bio', label: 'Biografia Curta', type: 'textarea', placeholder: 'Breve descrição do músico (1-2 frases)' },
     { name: 'order', label: 'Ordem', type: 'number', placeholder: '1' },

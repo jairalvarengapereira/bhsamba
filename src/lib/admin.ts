@@ -14,6 +14,7 @@ export async function getMembers() {
 export async function createMember(data: {
   name: string;
   role: string;
+  phone?: string;
   bio?: string;
   bioHistory?: string;
   imageUrl?: string;
@@ -23,6 +24,7 @@ export async function createMember(data: {
     data: {
       name: data.name,
       role: data.role,
+      phone: data.phone || null,
       bio: data.bio || null,
       bioHistory: data.bioHistory || null,
       imageUrl: data.imageUrl || null,
@@ -35,6 +37,7 @@ export async function createMember(data: {
 export async function updateMember(id: string, data: {
   name?: string;
   role?: string;
+  phone?: string;
   bio?: string;
   bioHistory?: string;
   imageUrl?: string;
@@ -46,6 +49,7 @@ export async function updateMember(id: string, data: {
     data: {
       ...(data.name && { name: data.name }),
       ...(data.role && { role: data.role }),
+      ...(data.phone !== undefined && { phone: data.phone }),
       ...(data.bio !== undefined && { bio: data.bio }),
       ...(data.bioHistory !== undefined && { bioHistory: data.bioHistory }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),

@@ -35,16 +35,19 @@ model media {
 }
 
 model members {
-  id        String   @id @default(uuid())
-  name      String
-  role      String
-  bio       String?
+  id         String   @id @default(uuid())
+  name       String
+  role       String
+  phone      String?  @map("phone")
+  bio        String?
   bioHistory String?  @map("biohistory")
-  imageUrl  String?  @map("imageurl")
-  order     Int      @default(0) @map("order")
-  isActive  Boolean  @default(true) @map("isactive")
-  createdAt DateTime @default(now()) @map("createdat")
-  updatedAt DateTime @updatedAt @map("updatedat")
+  imageUrl   String?  @map("imageurl")
+  order      Int      @default(0) @map("order")
+  isActive   Boolean  @default(true) @map("isactive")
+  createdAt  DateTime @default(now()) @map("createdat")
+  updatedAt  DateTime @updatedAt @map("updatedat")
+
+  voiceMessages voiceMessages[]
 
   @@map("members")
 }
@@ -57,4 +60,22 @@ model siteSettings {
   updatedAt DateTime @default(now()) @map("updatedat")
 
   @@map("site_settings")
+}
+
+model voiceMessages {
+  id          String   @id @default(uuid())
+  senderPhone String   @map("sender_phone")
+  senderName  String?  @map("sender_name")
+  audioUrl    String   @map("audio_url")
+  duration    Int?
+  status      String   @default("pending") @map("status")
+  memberId    String?  @map("member_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  member members? @relation(fields: [memberId], references: [id])
+
+  @@index([status])
+  @@index([memberId])
+  @@map("voice_messages")
 }
