@@ -283,6 +283,7 @@ function MessagesTab({ messages: members, onStatusChange, onDelete }: {
   const [audioMessages, setAudioMessages] = useState<VoiceMessage[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string>('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
 
@@ -306,6 +307,23 @@ function MessagesTab({ messages: members, onStatusChange, onDelete }: {
     };
     fetchMessages();
   }, []);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch('/api/admin/mural/sync', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Sync concluído! ${data.synced} áudio(s) novo(s), ${data.skipped} ignorado(s).`);
+        loadMessages();
+      } else {
+        alert('Erro no sync: ' + (data.error || 'Desconhecido'));
+      }
+    } catch (error) {
+      alert('Erro ao sincronizar');
+    }
+    setSyncing(false);
+  };
 
   const handleUploadAudio = async () => {
     if (!audioFile) {
@@ -377,6 +395,21 @@ function MessagesTab({ messages: members, onStatusChange, onDelete }: {
             <span>{uploadingAudio ? 'Enviando...' : 'Enviar'}</span>
           </button>
         </div>
+      </div>
+
+      <div className="bg-zinc-900 rounded-lg p-4">
+        <h3 className="font-bold text-[#C5A059] mb-4">Sincronizar WhatsApp</h3>
+        <p className="text-gray-400 text-sm mb-3">Busca novos áudios do grupo &quot;Bhs novo&quot; no WhatsApp</p>
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
+        >
+          <svg className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>{syncing ? 'Sincronizando...' : 'Sincronizar Áudios'}</span>
+        </button>
       </div>
 
       <div className="bg-zinc-900 rounded-lg overflow-hidden">
