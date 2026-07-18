@@ -36,7 +36,7 @@ async function fetchMessagesFromEvolution(since?: number): Promise<EvolutionMess
   const groupId = process.env.MURAL_GROUP_ID;
 
   if (!evoUrl || !evoKey || !groupId) {
-    throw new Error('Evolution API not configured');
+    throw new Error(`Evolution API not configured: URL=${!!evoUrl} KEY=${!!evoKey} GROUP=${!!groupId}`);
   }
 
   const where: Record<string, unknown> = {
@@ -46,6 +46,9 @@ async function fetchMessagesFromEvolution(since?: number): Promise<EvolutionMess
   if (since) {
     where.messageTimestamp = { gte: since };
   }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 90000);
 
   const response = await fetch(`${evoUrl}/chat/findMessages/${instance}`, {
     method: 'POST',
@@ -58,7 +61,10 @@ async function fetchMessagesFromEvolution(since?: number): Promise<EvolutionMess
       take: 50,
       orderBy: { messageTimestamp: 'desc' },
     }),
+    signal: controller.signal,
   });
+
+  clearTimeout(timeout);
 
   if (!response.ok) {
     throw new Error(`Evolution API error: ${response.status}`);

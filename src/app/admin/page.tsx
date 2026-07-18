@@ -317,7 +317,7 @@ function MessagesTab({ messages: members, onStatusChange, onDelete }: {
         alert(`Sync concluído! ${data.synced} áudio(s) novo(s), ${data.skipped} ignorado(s).`);
         loadMessages();
       } else {
-        alert('Erro no sync: ' + (data.error || 'Desconhecido'));
+        alert('Erro no sync: ' + (data.details || data.error || 'Desconhecido'));
       }
     } catch (error) {
       alert('Erro ao sincronizar');
