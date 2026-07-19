@@ -1,205 +1,98 @@
-# BHSamba — Último Ajuste e Ponto de Partida
-
-## Data: 17/06/2026
-
-## Projeto
-
-**Nome:** BHSamba — Site da Banda de Samba de Belo Horizonte
-**Owner:** Jair Alvarenga Pereira
-**Local:** `D:\Projetos\IA\Projetos\BHSamba\bhsamba`
-**GitHub:** https://github.com/jairalvarengapereira/bhsamba
-**Deploy:** https://bhsamba.vercel.app
-
-## Stack Tecnológica
-
-| Camada | Tecnologia |
-|--------|------------|
-| Frontend | Next.js 16.2.6 (App Router) |
-| Linguagem | TypeScript |
-| Estilização | Tailwind CSS |
-| Banco de Dados | Neon (PostgreSQL serverless) |
-| ORM | Prisma 7.8 |
-| Storage de Imagens | Supabase Storage (bucket: bhsamba) |
-| Deploy | Vercel |
-| Ícones | Lucide React |
-
-## Último Fix Aplicado (18/06/2026)
-
-**Commit:** `5d59a39` — `fix: normalizar data no form para evitar NaN no update de show`
-
-**Problema:** Ao editar um show existente e fazer upload de imagem, o `formData.date` mantinha o valor original do banco (string ISO como `"2026-06-20T00:00:00.000Z"`). Quando o usuário clicava "Salvar" sem alterar a data, essa string ISO era enviada para `parseDate()` que fazia `split('-')` e gerava `d = NaN` (por causa de `"20T00"`), resultando em data inválida.
-
-**Solução:** Adicionada normalização no `handleSubmit` que converte qualquer formato de data para `"YYYY-MM-DD"` usando métodos UTC, garantindo compatibilidade com `parseDate()`.
-
-**Arquivo alterado:**
-- `src/app/admin/page.tsx` — normalização de data no `handleSubmit` com `getUTCFullYear()`, `getUTCMonth()`, `getUTCDate()`
-
-## Fix Anterior (17/06/2026)
-
-**Commit:** `fa6c83c` — `fix: corrigir problema de timezone na data dos shows`
-
-**Problema:** Ao cadastrar um show, a data era salva com um dia de antecedência. O JavaScript `new Date("2026-06-20")` interpreta como UTC midnight, que no horário de Brasília (UTC-3) é 19/06 às 21:00. O PostgreSQL `@db.Date` truncava para 19/06.
-
-**Solução:**
-1. Função `parseDate()` criada em `admin.ts` — faz parse manual de "YYYY-MM-DD" e cria Date em UTC noon, evitando o shift de timezone.
-2. Form submission em `page.tsx` — conversão manual sem `new Date()`.
-3. `formatDate()` em `AgendaSection.tsx` — usa métodos UTC (`getUTCDate`, `getUTCMonth`, etc.) para exibir a data correta.
-4. Admin page — display de data com `timeZone: 'UTC'`.
-
-**Arquivos alterados:**
-- `src/lib/admin.ts` — função `parseDate()` + uso em create/update
-- `src/app/admin/page.tsx` — conversão de data no form + display com UTC
-- `src/components/AgendaSection.tsx` — `formatDate()` com métodos UTC
-
-## Fix Anterior (17/06/2026)
-
-**Commit:** `1a10d0a` — `fix: ordenar shows por data e horário crescente`
-
-**Problema:** Shows no mesmo dia não eram exibidos em ordem cronológica. O campo `date` no schema Prisma era `DateTime`, e o `orderBy` só considerava `date: 'asc'`, causando ordenação por ordem de inserção quando dois shows compartilhavam a mesma data.
-
-**Solução:**
-1. Schema Prisma alterado: `date DateTime` → `date DateTime @db.Date` — agora o PostgreSQL armazena apenas a data (sem hora), garantindo valores idênticos para shows no mesmo dia.
-2. Queries Prisma atualizadas em `db.ts` e `admin.ts`: `orderBy: [{ date: 'asc' }, { time: 'asc' }]` — ordenação secundária por horário.
-3. Ordenação client-side adicionada em `AgendaSection.tsx` como garantia extra.
-
-**Arquivos alterados:**
-- `prisma/schema.prisma` — campo `date` alterado para `@db.Date`
-- `src/lib/db.ts` — `getUpcomingShows()` com orderBy composto
-- `src/lib/admin.ts` — `getShows()` com orderBy composto
-- `src/components/AgendaSection.tsx` — sort client-side
-
-## Fix Anterior (08/06/2026)
-
-**Commit:** `4b1ca0b` — `fix: lazy init Supabase client to prevent build crash when env vars are missing`
-
-**Problema:** O upload de imagens retornava erro 500 no Vercel. O client Supabase era criado no nível do módulo em `src/app/api/admin/upload/route.ts`, causando crash na build quando as variáveis de ambiente não estavam configuradas.
-
-**Solução:** Client Supabase movido para dentro do handler (lazy initialization) com validação de variáveis.
-
-**Causa raiz adicional:** O Supabase estava em processo de restauração (provavelmente por inatividade prolongada — pausa automática após 7 dias sem atividade no plano gratuito).
-
-## Variáveis de Ambiente
-
-### No Vercel (configuradas)
-- `DATABASE_URL` — Neon PostgreSQL
-- `ADMIN_TOKEN` — Token de autenticação admin
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` — Número do WhatsApp
-- `NEXT_PUBLIC_SUPABASE_URL` — URL do projeto Supabase
-- `SUPABASE_SERVICE_ROLE_KEY` — Chave de serviço do Supabase
-
-### No .env local (atenção: não committar!)
-```env
-DATABASE_URL="postgresql://neondb_owner:...@ep-steep-cell-...neondb?sslmode=require"
-ADMIN_TOKEN=bhsamba2024
-NEXT_PUBLIC_WHATSAPP_NUMBER=5531988887777
-NEXT_PUBLIC_SUPABASE_URL=https://gnuawwkweacaokpohjbg.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<sua_key_aqui>
-```
-
-## Funcionalidades Implementadas
-
-### Painel Administrativo (`/admin`)
-- Gestão de Shows (CRUD completo)
-- Gestão de Músicos (CRUD completo)
-- Gestão da Galeria de Fotos (CRUD completo)
-- Configurações do Site
-- Upload de Imagens (Supabase Storage)
-- Interface responsiva com ícones modernos
-- Menu otimizado para mobile
-
-### Página Pública (`/`)
-- Seção Hero com chamada para ação
-- História da Banda
-- Apresentação dos Músicos (duas seções: história e componentes)
-- Agenda de Shows
-- Galeria de Fotos com Lightbox
-- Links para Redes Sociais
-- Botão WhatsApp flutuante
-- Menu de navegação responsivo
-
-## Estrutura Principal
-
-```
-src/
-├── app/
-│   ├── admin/
-│   │   ├── page.tsx          # Painel admin (client-side)
-│   │   └── login/            # Login do admin
-│   ├── api/
-│   │   └── admin/
-│   │       ├── auth/         # Autenticação
-│   │       ├── members/      # CRUD músicos
-│   │       ├── shows/        # CRUD shows
-│   │       ├── media/        # CRUD mídia
-│   │       ├── settings/     # Configurações
-│   │       └── upload/       # Upload de imagens (corrigido)
-│   ├── page.tsx              # Página principal
-│   └── layout.tsx            # Layout principal
-├── components/               # 8 componentes React
-├── lib/
-│   ├── admin.ts              # Funções CRUD admin
-│   └── db.ts                 # Configuração Prisma
-└── middleware.ts              # ⚠️ DEPRECATED — migrar para proxy
-```
-
-## Avisos e Pendências
-
-### 1. Middleware deprecado
-O Next.js 16 emite aviso:
-```
-The "middleware" file convention is deprecated. Please use "proxy" instead.
-```
-**Ação:** Migrar `src/middleware.ts` para a nova convenção `proxy`.
-
-### 2. Supabase Inatividade
-O plano gratuito pausa após **7 dias sem atividade**. Para evitar:
-- Criar cron job periódico (a cada 5-6 dias) que toca o Supabase
-- Ou manter o projeto ativo com uso regular
-
-### 3. Build Warning
-```
-⚠ The "middleware" file convention is deprecated. Please use "proxy" instead.
-```
-Não quebra, mas deve ser resolvido antes de atualizar o Next.js.
-
-## Cores do Site
-
-| Cor | Hex | Uso |
-|-----|-----|-----|
-| Verde Rio | `#009B3A` | Botões, destaques |
-| Dourado | `#C5A059` | Títulos, bordas |
-| Amarelo | `#F9C412` | Gradientes |
-| Azul | `#002776` | Backgrounds |
-| Preto | `#0a0a0a` | Fundos escuros |
-
-## Comandos Úteis
-
-```bash
-# Desenvolvimento
-npm run dev
-
-# Build
-npm run build
-
-# Lint
-npm run lint
-
-# Gerar Prisma Client
-npx prisma generate
-
-# Push do schema para o banco
-npx prisma db push
-```
-
-## Como Continuar
-
-Diga algo como:
-> "Continuar o projeto BHSamba"
-
-Ou especifique a tarefa:
-> "Continuar o projeto BHSamba — [descreva o que precisa]"
+# Último Ajuste - Mural de Recados de Voz
+**Data:** 18/07/2026
+**Status:** SUSPENSO (aguardando plano pago Railway ou Render)
 
 ---
 
-**Criado em:** 14/05/2026
-**Última atualização:** 18/06/2026
+## O que foi feito
+
+### Sistema completo implementado
+- **Schema Prisma:** Campo `phone` no modelo `members` + novo modelo `voiceMessages`
+- **Funções CRUD:** `lib/mural.ts` (getVoiceMessages, getApprovedMessages, createMessage, updateMessageStatus, deleteMessage, findMemberByPhone)
+- **API Routes:**
+  - `/api/mural` — público, retorna áudios aprovados
+  - `/api/mural/webhook` — recebe áudios do WhatsApp via Evolution API
+  - `/api/mural/sync` — busca áudios da Evolution API (polling)
+  - `/api/admin/mural` — CRUD para moderação
+  - `/api/admin/mural/upload` — upload manual de áudio
+  - `/api/admin/mural/sync` — sync via admin autenticado
+- **Frontend:**
+  - `VoicMailSection.tsx` — player de áudio com barra de progresso
+  - `SendVoiceButton.tsx` — botão flutuante do WhatsApp
+  - `/mural` — página pública (server component, force-dynamic)
+  - Admin com aba "Recados" + botão "Sincronizar Áudios"
+- **Banco de Dados:** Migrações aplicadas no Neon DB
+- **Deploy:** Código no GitHub, Vercel deployado
+
+### Evolution API (Render Free Tier)
+- URL: `https://evolution-api-f54o.onrender.com`
+- API Key: `bhsamba2024`
+- Instância: `bhsamba`
+- Número: `5531988887777`
+- Webhook configurado: `https://bhsamba.vercel.app/api/mural/webhook`
+- `syncFullHistory: true`
+
+### Variáveis de ambiente (Vercel)
+- `EVOLUTION_API_URL`: `https://evolution-api-f54o.onrender.com`
+- `EVOLUTION_API_KEY`: `bhsamba2024`
+- `EVOLUTION_INSTANCE`: `bhsamba`
+- `MURAL_GROUP_ID`: `120363419714874389@g.us` (grupo "Bhs novo")
+
+---
+
+## Problema atual
+
+**O Render Free Tier não é confiável** para manter conexão WhatsApp:
+1. O serviço dorme após ~15 min sem requests
+2. Quando acorda, a conexão WhatsApp cai (estado: `close`)
+3. Precisa reconectar (escanear QR code) frequentemente
+4. Mensagens do grupo são perdidas durante os restarts
+5. O webhook não é acionado quando o serviço está dormindo
+6. O polling (`/api/mural/sync`) retorna 0 mensagens porque o banco do Render não persiste as mensagens do WhatsApp
+
+**Tentativas feitas:**
+- Webhook: funciona quando o serviço está ativo, mas perde mensagens
+- Polling via sync: Evolution API retorna 0 mensagens no banco
+- Reconexão frequente:QR code expira rápido, inconveniente
+
+---
+
+## Próximos passos (quando puder pagar)
+
+### Opção 1: Railway (recomendado)
+- Criar conta no Railway (plano pago ~$5/mês)
+- Deploy do Evolution API via Docker
+- PostgreSQL gerenciado pelo Railway
+- Não dorme entre requests → conexão WhatsApp estável
+
+### Opção 2: Upgrade Render
+- Plano pago do Render (~$7/mês)
+- Não dorme → webhook funciona sempre
+
+### Opção 3: Outro provedor
+- Fly.io, DigitalOcean, etc.
+
+---
+
+## Como reconectar quando voltar
+
+1. Deploy da Evolution API no novo servidor
+2. Atualizar `EVOLUTION_API_URL` no Vercel
+3. Criar instância `bhsamba` com webhook apontando para Vercel
+4. Conectar WhatsApp escaneando QR code
+5. Testar: enviar áudio no grupo → sync → verificar no admin
+6. Configurar cron-job.org para sync automático a cada 5 min
+
+---
+
+## Arquivos importantes
+- `src/app/api/mural/webhook/route.ts` — webhook Evolution API
+- `src/app/api/mural/sync/route.ts` — polling para buscar áudios
+- `src/app/api/admin/mural/sync/route.ts` — sync autenticado
+- `src/lib/mural.ts` — funções CRUD
+- `src/components/VoicMailSection.tsx` — player de áudio
+- `src/app/admin/page.tsx` — painel admin com aba Recados
+- `src/app/mural/page.tsx` — página pública do mural
+- `prisma/schema.prisma` — schema com voiceMessages
+- `DOCSIS.md` — documentação completa
+- `GUIA_EVOLUTION_API.md` — guia de setup da Evolution API
