@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Pencil, Trash2, Plus, Image, X, Check, Video, Settings, Users, Calendar, CheckSquare, Volume2, Upload } from 'lucide-react';
+import { Pencil, Trash2, Plus, Image, X, Check, Video, Settings, Users, Calendar, CheckSquare, Volume2, Upload, Copy } from 'lucide-react';
 
 interface Member {
   id: string;
@@ -221,6 +221,11 @@ export default function AdminDashboard() {
             onEdit={(item) => { setEditingItem(item); setShowModal(true); }}
             onDelete={(id) => handleDelete('shows', id)}
             onAdd={() => { setEditingItem(null); setShowModal(true); }}
+            onCopy={(item) => {
+              const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest } = item;
+              setEditingItem(rest);
+              setShowModal(true);
+            }}
             fields={[
               { name: 'title', label: 'Título', type: 'text' },
               { name: 'date', label: 'Data', type: 'date' },
@@ -556,12 +561,13 @@ function SettingsTab({ settings, setSettings, onSave, saving }: {
   );
 }
 
-function CrudTab({ title, items, onEdit, onDelete, onAdd, fields }: {
+function CrudTab({ title, items, onEdit, onDelete, onAdd, onCopy, fields }: {
   title: string;
   items: any[];
   onEdit: (item: any) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
+  onCopy?: (item: any) => void;
   fields: any[];
 }) {
   return (
@@ -602,6 +608,11 @@ function CrudTab({ title, items, onEdit, onDelete, onAdd, fields }: {
                     <button onClick={() => onEdit(item)} className="p-2 text-blue-400 hover:bg-blue-400/20 rounded" title="Editar">
                       <Pencil size={18} />
                     </button>
+                    {onCopy && (
+                      <button onClick={() => onCopy(item)} className="p-2 text-amber-400 hover:bg-amber-400/20 rounded" title="Copiar show">
+                        <Copy size={18} />
+                      </button>
+                    )}
                     <button onClick={() => onDelete(item.id)} className="p-2 text-red-400 hover:bg-red-400/20 rounded" title="Excluir">
                       <Trash2 size={18} />
                     </button>
