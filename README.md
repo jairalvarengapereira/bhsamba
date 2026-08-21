@@ -217,7 +217,7 @@ npm run dev
 ## Funcionalidades
 
 ### Painel Administrativo
-- ✅ Gestão de Shows (CRUD completo)
+- ✅ Gestão de Shows (CRUD completo + cópia para agendamentos recorrentes)
 - ✅ Gestão de Músicos (CRUD completo)
 - ✅ Gestão da Galeria de Fotos (CRUD completo)
 - ✅ Configurações do Site

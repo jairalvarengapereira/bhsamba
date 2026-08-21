@@ -1,6 +1,28 @@
-# Último Ajuste - Mural de Recados de Voz
-**Data:** 18/07/2026
-**Status:** SUSPENSO (aguardando plano pago Railway ou Render)
+# Último Ajuste - Botão de Copiar Show
+**Data:** 21/08/2026
+**Status:** IMPLEMENTADO e enviado ao GitHub
+
+---
+
+## O que foi feito
+
+### Funcionalidade de Copiar Show no Admin
+- **Motivo:** A banda tem casa fixa (shows todos os domingos). Em vez de criar um novo show do zero, o admin pode copiar um existente e ajustar apenas data/hora.
+- **Como funciona:**
+  - Botão "Copiar" (ícone amarelo `Copy`) na tabela de shows
+  - Ao clicar, abre o modal pré-preenchido com todos os dados do show original
+  - O usuário ajusta data, horário e outros campos conforme necessário
+  - Ao salvar, cria um novo registro (não sobrescreve o original)
+
+### Arquivos alterados
+- `src/app/admin/page.tsx` — Adicionado ícone `Copy`, prop `onCopy` no `CrudTab`, handler no shows
+
+### Commits
+- `34f24c9` — feat: adicionar botão de copiar show no admin para agendamentos recorrentes
+
+---
+
+# Histórico: Mural de Recados de Voz (SUSPENSO)
 
 ---
 
