@@ -675,12 +675,16 @@ const fields = type === 'members' ? [
         body: uploadFormData,
       });
       
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
         setFormData((prev: Record<string, any>) => ({ ...prev, [fieldName]: data.url }));
       } else {
-        const errorData = await res.json();
-        alert('Erro ao fazer upload: ' + errorData.error);
+        if (res.status === 401) {
+          alert('Sessão expirada. Faça login novamente em /admin/login.');
+        } else {
+          console.error('Upload falhou:', res.status, data);
+          alert(`Erro ao fazer upload (${res.status}): ` + (data.error || 'erro desconhecido'));
+        }
       }
     } catch (error) {
       alert('Erro ao fazer upload');
