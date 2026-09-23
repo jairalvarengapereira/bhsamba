@@ -17,17 +17,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseKey) {
+  if (!rawUrl || !supabaseKey) {
     return NextResponse.json(
       { error: 'Variáveis NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY não configuradas.' },
       { status: 500 }
     );
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = rawUrl.trim().replace(/^["']|["']$/g, '').replace(/\/+$/, '');
+  let supabaseHost = 'invalid-url';
+  try {
+    supabaseHost = new URL(supabaseUrl).host;
+  } catch {
+    console.error('Supabase URL inválida configurada. Len:', supabaseUrl.length);
+    return NextResponse.json(
+      { error: 'NEXT_PUBLIC_SUPABASE_URL inválida no Vercel.', code: 'SUPABASE_BAD_URL' },
+      { status: 500 }
+    );
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey.trim());
 
   try {
     const formData = await request.formData();
@@ -68,9 +80,33 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Supabase upload error:', JSON.stringify(error));
+      const msg = error.message || 'unknown';
+      console.error(
+        `Supabase upload error host=${supabaseHost} bucket=bhsamba size=${file.size} type=${file.type}:`,
+        JSON.stringify(error)
+      );
+      if (msg.includes('fetch failed') || msg.includes('Failed to fetch') || msg.includes('ENOTFOUND')) {
+        return NextResponse.json(
+          {
+            error: `Supabase inalcançável (${supabaseHost}). Verifique NEXT_PUBLIC_SUPABASE_URL no Vercel, se o projeto Supabase está ativo e se o bucket 'bhsamba' existe.`,
+            code: 'SUPABASE_UNREACHABLE',
+            host: supabaseHost,
+          },
+          { status: 500 }
+        );
+      }
+      if (msg.includes('Bucket not found') || msg.includes('bucket')) {
+        return NextResponse.json(
+          {
+            error: `Bucket 'bhsamba' não encontrado no projeto ${supabaseHost}. Crie o bucket no Supabase Storage.`,
+            code: 'SUPABASE_BUCKET_NOT_FOUND',
+            host: supabaseHost,
+          },
+          { status: 500 }
+        );
+      }
       return NextResponse.json(
-        { error: 'Upload failed: ' + error.message, code: 'SUPABASE_UPLOAD_ERROR' },
+        { error: 'Upload failed: ' + msg, code: 'SUPABASE_UPLOAD_ERROR', host: supabaseHost },
         { status: 500 }
       );
     }
