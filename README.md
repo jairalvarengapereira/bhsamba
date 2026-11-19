@@ -4,7 +4,7 @@
 
 ## Visão Geral
 
-**BHSamba** é o site oficial da banda de samba de Belo Horizonte. O projeto é uma aplicação web moderna desenvolvida com Next.js, permitindo a gestão de shows, músicos, galeria de fotos e configurações do site. bhsamba.vercel.app
+**BHSamba** é o site oficial da banda de samba de Belo Horizonte. O projeto é uma aplicação web moderna desenvolvida com Next.js, permitindo a gestão de shows, músicos, galeria de fotos e configurações do site. URL: www.bhsamba.vercel.app
 
 ## Stack Tecnológica
 
